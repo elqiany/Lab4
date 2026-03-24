@@ -7,6 +7,7 @@ module controlFSM
      input logic StartGame,
      input logic MPLoaded,
      input logic GameWon,
+     input logic GradeIt,
      input logic [3:0] RoundNumber,
 
      output logic [1:0] state,
@@ -47,14 +48,14 @@ module controlFSM
             play: begin
                 if (gameWon)
                     nextState = first_tick;
-                else if (roundNumber == 4'd7)
+                else if (RoundNumber == 4'd7)
                     nextState = final_guess;
                 else
                     nextState = play;
             end
 
             final_guess: begin
-                if (finalDone)
+                if (GradeIt)
                     nextState = first_tick;
                 else
                     nextState = final_guess;
