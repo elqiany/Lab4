@@ -27,7 +27,11 @@ module top(
     logic gradeIt_sync;
     logic [2:0] loadShape_sync;
     logic [1:0] shapeLocation_sync;
+    logic [1:0] state;
+    logic [1:0] state0;
+    logic [1:0] state2;
     logic loadShapeNow_sync;
+    logic Restart_Game; //This is new logic because can't have same input and output to FSM
 
     Synchronizer sync_coin0 (.async(CoinValue[0]), .clock(CLOCK_100), . sync(coinValue_sync[0]);
     Synchronizer sync_coin1 (.async(CoinValue[1]), .clock(CLOCK_100), . sync(coinValue_sync[1]);
@@ -115,7 +119,12 @@ module top(
     Comparator comp (
         .A(2'b00),
         .B(state),
-        .AeqB(comp_out));
+        .AeqB(state0)); //unsure if this is meant to be output or clear in diagram
+
+    Comparator comp (
+        .A(2'b10),
+        .B(state),
+        .AeqB(state2));
 
     and a1 (magComp_out, drop, and_out1);
     or o1 (startGame, and_out1, or_out);
@@ -151,5 +160,16 @@ module top(
         .AeqB(znarlyComp_out));
 
     and a2 (znarlyComp_out, state2, GameWon);
+
+    controlFSM mainFSM (
+        .CLOCK_100(CLOCK_100),
+        .reset(reset),
+        .StartGame(StartGame_sync),
+        .MPLoaded(isMPLoaded), //assume this is meaning idk
+        .GameWon(GameWon),
+        .GradeIt(GradeIt),
+        .RoundNumber(RoundNumber),
+        .state(state),
+        .RestartGame(RestartGame));
 
 endmodule : top
