@@ -4,13 +4,13 @@ module controlFSM
     (input logic CLOCK_100,
      input logic reset,
 
+     input logic StartGame,
      input logic MPLoaded,
-     input logic gameWon,
-     input logic [3:0] roundNumber,
-     input logic finalDone,
+     input logic GameWon,
+     input logic [3:0] RoundNumber,
 
      output logic [1:0] state,
-     output logic startGame);
+     output logic RestartGame);
 
      typedef enum logic [1:0] {
          first_tick = 2'b00,
@@ -38,7 +38,7 @@ module controlFSM
             end
 
             pre_game: begin
-                if (MPLoaded)
+                if (StartGame && MPLoaded)
                     nextState = play;
                 else
                     nextState = pre_game;
@@ -68,11 +68,11 @@ module controlFSM
 
     always_comb begin
         state = currState;
-        startGame = 1'b0;
+        RestartGame = 1'b0;
 
         case (currState)
-            first_tick: startGame = 1'b1;
-            default: startGame = 1'b0;
+            first_tick: RestartGame = 1'b1;
+            default: RestartGame = 1'b0;
         endcase
     end
 

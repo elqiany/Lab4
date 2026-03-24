@@ -6,20 +6,19 @@ module top(
     input logic [1:0] coinValue,
     input logic coinInserted,
 
-    input logic [1:0] shapeLocation,
-    input logic loadShapeNow,
-    input logic [2:0] loadShape,
+    input logic [1:0] ShapeLocation,
+    input logic LoadShapeNow,
+    input logic [2:0] LoadShape,
 
     input logic [11:0] Guess,
     input logic GradeIt,
-    input logic startGame,
+    input logic StartGame,
 
-    output logic [1:0] state,
-    output logic [3:0] numGames,
-    output logic [3:0] roundNumber,
+    output logic [3:0] NumGames,
+    output logic [3:0] RoundNumber,
     output logic [3:0] Znarly,
     output logic [3:0] Zood,
-    output logic gameWon);
+    output logic GameWon);
 
     logic [1:0] coinValue_sync;
     logic coinInserted_sync;
@@ -34,9 +33,9 @@ module top(
     Synchronizer sync_coin1 (.async(CoinValue[1]), .clock(CLOCK_100), . sync(coinValue_sync[1]);
 
     Synchronizer sync_coinIns (.async(coinInserted), .clock(CLOCK_100), . sync(coinInserted_sync);
-    Synchronizer sync_start (.async(startGame), .clock(CLOCK_100), . sync(startGame_sync);
-    Synchronizer sync_grade (.async(gradeIt), .clock(CLOCK_100), . sync(gradeIt_sync);
-    Synchronizer sync_loadNow (.async(loadShapeNow), .clock(CLOCK_100), . sync(loadShapeNow_sync);
+    Synchronizer sync_start (.async(StartGame), .clock(CLOCK_100), . sync(StartGame_sync);
+    Synchronizer sync_grade (.async(GradeIt), .clock(CLOCK_100), . sync(GradeIt_sync);
+    Synchronizer sync_loadNow (.async(LoadShapeNow), .clock(CLOCK_100), . sync(LoadShapeNow_sync);
 
 
     //myAbstractFSM outputs
@@ -70,12 +69,14 @@ module top(
     //edgeDetectorFSM output
     logic gradeIt_out;
 
+    //output from comparator to see if there are 4 znarly's
+    logic znarlyComp_out;
+
     //missing the box before the Abstract not sure how or what it means
     myAbstractFSM coinFSM (
         .clock(CLOCK_100),
         .reset(reset),
-        .coinValue(coinValue_sync),
-        .coinInserted(coinInserted_sync),
+        .coin(coinValue_sync),
         .credit(credit),
         .drop(drop));
 
@@ -95,13 +96,12 @@ module top(
         .FSMTot(FSMTot),
         .isMPLoaded(isMPLoaded));
 
-
     controlFSM ctrl (
         .CLOCK_100(CLOCK_100),
         .reset(reset),
         .startGame(paid_start),
         .MPLoaded(isMPLoaded),
-        .gameWon(gameWon)
+        .gameWon(GameWon)
         .roundNumber(RoundNumber),
         .state(state));
 
@@ -127,7 +127,7 @@ module top(
                     .load(comp_out),
                     .clock(CLOCK_100),
                     .up(startGame), //im unsure if this is what diagram wants, looks to be a circle (?) before  so idk
-                    .Q(numGames));
+                    .Q(NumGames));
 
 
     edgeDetectorFSM edgeGrade (
@@ -145,4 +145,11 @@ module top(
         .up(1'b1),
         .Q(RoundNumber));
 
+    Comparator znarlyComp (
+        .A(Znarlygreen),
+        .B(4'b1111),
+        .AeqB(znarlyComp_out));
 
+    and a2 (znarlyComp_out, state2, GameWon);
+
+endmodule : top
