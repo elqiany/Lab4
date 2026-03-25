@@ -41,6 +41,8 @@ module top(
     Synchronizer sync_grade (.async(GradeIt), .clock(CLOCK_100), . sync(GradeIt_sync);
     Synchronizer sync_loadNow (.async(LoadShapeNow), .clock(CLOCK_100), . sync(LoadShapeNow_sync);
 
+    //First edge detector for coinInserted button
+    logic coinInserted_out;
 
     //myAbstractFSM outputs
     logic [1:0] state;
@@ -76,11 +78,27 @@ module top(
     //output from comparator to see if there are 4 znarly's
     logic znarlyComp_out;
 
+    logic [1:0] coin_to_fsm;
+
     //missing the box before the Abstract not sure how or what it means
-    myAbstractFSM coinFSM (
+
+    edgeDetectorFSM edgeCoin (
+        .CLOCK_100(CLOCK_100),
+        .reset(reset),
+        .btn(coinInserted),
+        .grade_it(coinInserted_out));
+
+    //mux2to1 based on if coinInserted on edge is equal to 0 or 1
+    Mux2to1  #(.WIDTH(2)) coinMux (
+        .I0(2'b00),
+        .I1(coinValue_sync),
+        .S(coinInserted_out),
+        .Y(coin_to_fsm));
+
+    myAbstractFSM coinFSM  (
         .clock(CLOCK_100),
         .reset(reset),
-        .coin(coinValue_sync),
+        .coin(coin_to_fsm),
         .credit(credit),
         .drop(drop));
 
@@ -103,9 +121,10 @@ module top(
     controlFSM ctrl (
         .CLOCK_100(CLOCK_100),
         .reset(reset),
-        .startGame(paid_start),
+        .startGame(startGame_sync),
         .MPLoaded(isMPLoaded),
-        .gameWon(GameWon)
+        .GameWon(GameWon),
+        .GradeIt(GradeIt_sync),
         .roundNumber(RoundNumber),
         .state(state));
 
