@@ -1,6 +1,6 @@
 `default_nettype none
 
-module controlFSM_testbench;
+module controlFSM_test;
 
     logic clock;
     logic reset;
@@ -116,4 +116,4 @@ module controlFSM_testbench;
         $finish;
     end
 
-endmodule : controlFSM_testbench
+endmodule : controlFSM_test
