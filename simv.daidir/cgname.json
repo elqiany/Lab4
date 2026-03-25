@@ -5,9 +5,75 @@
         "module",
         1
     ],
-    "controlFSM_testbench": [
-        "controlFSM_testbench",
-        "D7KAb",
+    "edgeDetectorFSM": [
+        "edgeDetectorFSM",
+        "GeTKR",
+        "module",
+        5
+    ],
+    "edgeDetectorFSM_0000__port_gym": [
+        "edgeDetectorFSM_0000__port_gym",
+        "ieMTE",
+        "module",
+        6
+    ],
+    "Multiplexer": [
+        "Multiplexer",
+        "UxyT3",
+        "module",
+        7
+    ],
+    "DFlipFlop": [
+        "DFlipFlop",
+        "NafP4",
+        "module",
+        8
+    ],
+    "ShiftRegisterSIPO": [
+        "ShiftRegisterSIPO",
+        "QtqVB",
+        "module",
+        9
+    ],
+    "ShiftRegisterPIPO": [
+        "ShiftRegisterPIPO",
+        "w133T",
+        "module",
+        10
+    ],
+    "BarrelShiftRegister": [
+        "BarrelShiftRegister",
+        "ts568",
+        "module",
+        11
+    ],
+    "BusDriver": [
+        "BusDriver",
+        "Bt4nZ",
+        "module",
+        12
+    ],
+    "Memory": [
+        "Memory",
+        "f0K8C",
+        "module",
+        13
+    ],
+    "SaveShape": [
+        "SaveShape",
+        "Um4KK",
+        "module",
+        14
+    ],
+    "CM": [
+        "CM",
+        "Ukmij",
+        "module",
+        15
+    ],
+    "top_tb": [
+        "top_tb",
+        "W0eJz",
         "module",
         4
     ],

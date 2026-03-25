@@ -1,6 +1,6 @@
 `default_nettype none
 
-module top_tb;
+module top_testbench;
 
     logic CLOCK_100;
     logic reset, coinInserted;
@@ -154,4 +154,4 @@ module top_tb;
         $finish;
     end
 
-endmodule : top_tb
+endmodule : top_testbench
