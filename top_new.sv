@@ -117,6 +117,7 @@ module top
     (.clock(CLOCK_100), .reset(reset), .StartGame(StartGame_sync),
      .MPLoaded(isMPLoaded), .GameWon(GameWon),
      .GradeIt(GradeIt_sync), .RoundNumber(RoundNumber),
+     .NumGames(NumGames),
      .state(state), .RestartGame(RestartGame));
 endmodule : top
 
