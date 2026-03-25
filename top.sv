@@ -84,13 +84,6 @@ module top(
         .credit(credit),
         .drop(drop));
 
-    MagComp gameComp (
-        .A(numGames),
-        .B(4'b0110),
-        .AltB(),
-        .AeqB(),
-        .AgtB(comp_out));
-
     MPMemory mem (
         .clock(CLOCK_100),
         .shapeLocation(shapeLocation),
@@ -99,6 +92,13 @@ module top(
         .memTot(memTot),
         .FSMTot(FSMTot),
         .isMPLoaded(isMPLoaded));
+
+    Part1 grader (
+        .Guess(Guess),
+        .masterPattern(masterPattern),
+        .GradeIt(GradeIt),
+        .yellows(Zoodyellow),
+        .greens(Znarlygreen));
 
     controlFSM ctrl (
         .CLOCK_100(CLOCK_100),
@@ -109,23 +109,24 @@ module top(
         .roundNumber(RoundNumber),
         .state(state));
 
-    Part1 grader (
-        .Guess(Guess),
-        .masterPattern(masterPattern),
-        .GradeIt(GradeIt),
-        .yellows(Zoodyellow),
-        .greens(Znarlygreen));
+    MagComp gameComp (
+        .A(numGames),
+        .B(4'b0110),
+        .AltB(),
+        .AeqB(),
+        .AgtB(comp_out));
 
-    Comparator comp (
+    Comparator state0comp (
         .A(2'b00),
         .B(state),
         .AeqB(state0)); //unsure if this is meant to be output or clear in diagram
 
-    Comparator comp (
+    Comparator state2comp (
         .A(2'b10),
         .B(state),
         .AeqB(state2));
 
+    //calculations before NumGames counter
     and a1 (magComp_out, drop, and_out1);
     or o1 (startGame, and_out1, or_out);
 
@@ -139,6 +140,7 @@ module top(
                     .Q(NumGames));
 
 
+    //Grade It Button detector
     edgeDetectorFSM edgeGrade (
         .CLOCK_100(CLOCK_100),
         .reset(reset),
@@ -154,22 +156,21 @@ module top(
         .up(1'b1),
         .Q(RoundNumber));
 
+    //output znarly and zood
+    convertZood czood (
+        .Zood3(Zoodyellow),
+        .Zood4(Zood));
+
+    convertZnarly cznarly (
+        .ZnarlyBit(Znarlygreen),
+        .ZnarlyVal(Znarly));
+
+    //output GameWon
     Comparator znarlyComp (
         .A(Znarlygreen),
         .B(4'b1111),
         .AeqB(znarlyComp_out));
 
     and a2 (znarlyComp_out, state2, GameWon);
-
-    controlFSM mainFSM (
-        .CLOCK_100(CLOCK_100),
-        .reset(reset),
-        .StartGame(StartGame_sync),
-        .MPLoaded(isMPLoaded), //assume this is meaning idk
-        .GameWon(GameWon),
-        .GradeIt(GradeIt),
-        .RoundNumber(RoundNumber),
-        .state(state),
-        .RestartGame(RestartGame));
 
 endmodule : top
