@@ -1,0 +1,6 @@
+Command exited with non-zero status 255
+{"vcs1":{"timestamp_begin":1774451445.150613398, "rt":0.72, "ut":0.15, "st":0.08}}
+{"SNPS_VCS_INTERNAL_ROOT_START_TIME": 1774451444.430123560}
+{"VCS_COMP_START_TIME": 1774451444.430123560}
+{"VCS_COMP_END_TIME": 1774451446.029424713}
+{"VCS_USER_OPTIONS": "-sverilog top_new.sv edgeDetectorFSM.sv hw6library.sv controlFSM.sv"}

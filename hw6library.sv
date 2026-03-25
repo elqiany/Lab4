@@ -9,16 +9,16 @@ module Comparator
   #(parameter WIDTH=4)
    (output logic             AeqB,
     input  logic [WIDTH-1:0] A, B);
-    
+
   MagComp mc(.A,
              .B,
              .AeqB,
              .AltB(),
              .AgtB()
             );
-            
+
 endmodule: Comparator
-    
+
 // A Magnitude Comparator does an unsigned comparison of two input values.
 module MagComp
   #(parameter   WIDTH = 8)
@@ -197,7 +197,7 @@ module ShiftRegisterSIPO
       else
         Q <= {serial, Q[WIDTH-1:1]};
 
-endmodule : ShiftRegister_SIPO
+endmodule : ShiftRegisterSIPO
 
 // A PIPO Shift Register, with controllable shift direction
 // Load has priority over shifting.
@@ -216,7 +216,7 @@ module ShiftRegisterPIPO
       else
         Q <= {1'b0, Q[WIDTH-1:1]};
 
-endmodule : ShiftRegister_PIPO
+endmodule : ShiftRegisterPIPO
 
 // A BSR shifts bits to the left by a variable amount
 module BarrelShiftRegister
