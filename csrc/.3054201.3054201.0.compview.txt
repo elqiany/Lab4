@@ -1,0 +1,9 @@
+{"vcs1":{"timestamp_begin":1774469149.202459381, "rt":0.91, "ut":0.50, "st":0.24}}
+{"vcselab":{"timestamp_begin":1774469150.281327529, "rt":0.86, "ut":0.59, "st":0.23}}
+{"link":{"timestamp_begin":1774469151.275300678, "rt":0.64, "ut":0.26, "st":0.37}}
+{"SNPS_VCS_INTERNAL_ROOT_START_TIME": 1774469148.332247010}
+{"VCS_COMP_START_TIME": 1774469148.332247010}
+{"VCS_COMP_END_TIME": 1774469152.084360342}
+{"VCS_USER_OPTIONS": "-sverilog top_new.sv edgeDetectorFSM_new.sv library.sv controlFSM_new.sv MPMemory.sv AbstractFSM.sv Part1_new.sv top_test_new.sv"}
+{"vcs1": {"peak_mem": 3054494}}
+{"stitch_vcselab": {"peak_mem": 3054549}}

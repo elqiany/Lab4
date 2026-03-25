@@ -28,14 +28,14 @@ controlFSM_new.sv
 MPMemory.sv
 AbstractFSM.sv
 Part1_new.sv
-top_test.sv
+top_test_new.sv
 59
 which_declare=declare -f
 XIL_HOME=/afs/ece/support/xilinx/xilinx.release/Vivado-2024.2/Vivado/2024.2
 XILINX_VIVADO=/afs/ece.cmu.edu/support/xilinx/xilinx.release/Vivado-2024.2/Vivado/2024.2
 XILINX_VITIS=/afs/ece.cmu.edu/support/xilinx/xilinx.release/Vivado-2024.2/Vitis/2024.2
 XILINX_HLS=/afs/ece.cmu.edu/support/xilinx/xilinx.release/Vivado-2024.2/Vitis/2024.2
-XDG_SESSION_ID=3555
+XDG_SESSION_ID=3585
 XDG_RUNTIME_DIR=/run/user/2698886
 XDG_DATA_DIRS=/afs/andrew.cmu.edu/usr21/eqian/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share
 VMR_MODE_FLAG=32
@@ -55,9 +55,9 @@ TOOL_HOME=/afs/ece.cmu.edu/support/synopsys/synopsys.release/T-Foundation/vcs/T-
 S_COLORS=auto
 SYN_DIR=/syn/T-2022.03-SP2
 SYNOPSYS_HOME=/afs/ece.cmu.edu/support/synopsys/synopsys.release/T-Foundation
-SSH_TTY=/dev/pts/4
-SSH_CONNECTION=172.26.37.24 51067 172.19.137.183 22
-SSH_CLIENT=172.26.37.24 51067 22
+SSH_TTY=/dev/pts/7
+SSH_CONNECTION=172.26.23.139 62903 172.19.137.183 22
+SSH_CLIENT=172.26.23.139 62903 22
 SSH_ASKPASS=/usr/libexec/openssh/gnome-ssh-askpass
 SNPS_VCS_CLANG_PATH=/afs/ece.cmu.edu/support/synopsys/synopsys.release/T-Foundation/vcs/T-2022.06/linux64/clang
 SNPS_INTERNAL_VCS_LINUX_OS=linux
@@ -82,7 +82,7 @@ HISTCONTROL=ignoredups
 GDK_BACKEND=x11
 FASTX_INSTALL_DISABLE=fastx4,sshd,rlm
 DC_HOME=/syn/T-2022.03-SP2/
-DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-IllvV4KRB2,guid=8ba5b76f420978a6ca60a61e69c3f53e
+DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-jY7Phz04xp,guid=bde28ca31d9d38a68cfecc8869c43df2
 BASH_FUNC_which%%=() {  ( alias;_ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@_}
 BASH_FUNC_switchml%%=() {  typeset swfound=1;_ if [ "${MODULES_USE_COMPAT_VERSION:-0}" = '1' ]; then_ typeset swname='main';_ if [ -e /usr/share/Modules/libexec/modulecmd.tcl ]; then_ typeset swfound=0;_ unset MODULES_USE_COMPAT_VERSION;_ fi;_ else_ typeset swname='compatibility';_ if [ -e /usr/share/Modules/libexec/modulecmd-compat ]; then_ typeset swfound=0;_ MODULES_USE_COMPAT_VERSION=1;_ export MODULES_USE_COMPAT_VERSION;_ fi;_ fi;_ if [ $swfound -eq 0 ]; then_ echo "Switching to Modules $swname version";_ source /usr/share/Modules/init/bash;_ else_ echo "Cannot switch to Modules $swname version, command not found";_ return 1;_ fi_}
 BASH_FUNC_scl%%=() {  if [ "$1" = "load" -o "$1" = "unload" ]; then_ eval "module $@";_ else_ /usr/bin/scl "$@";_ fi_}
@@ -92,18 +92,18 @@ BASH_FUNC__module_raw%%=() {  unset _mlshdbg;_ if [ "${MODULES_SILENT_SHELL_DEBU
 0
 0
 8
-1774454887 top_test.sv
+1774468612 top_test_new.sv
 1774451942 Part1_new.sv
 1774451772 AbstractFSM.sv
 1774451824 MPMemory.sv
-1774451733 controlFSM_new.sv
+1774469423 controlFSM_new.sv
 1774451691 library.sv
 1774451576 edgeDetectorFSM_new.sv
-1774451359 top_new.sv
+1774469388 top_new.sv
 4
 1654054205 /afs/ece.cmu.edu/support/synopsys/synopsys.release/T-Foundation/vcs/T-2022.06/linux64/lib/libvirsim.so
 1654053585 /afs/ece.cmu.edu/support/synopsys/synopsys.release/T-Foundation/vcs/T-2022.06/linux64/lib/liberrorinf.so
 1654053489 /afs/ece.cmu.edu/support/synopsys/synopsys.release/T-Foundation/vcs/T-2022.06/linux64/lib/libsnpsmalloc.so
 1654053565 /afs/ece.cmu.edu/support/synopsys/synopsys.release/T-Foundation/vcs/T-2022.06/linux64/lib/libvfs.so
-1774454892 simv.daidir
+1774469432 simv.daidir
 -1 partitionlib

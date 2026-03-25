@@ -5,6 +5,7 @@ module controlFSM
      input logic reset, StartGame, MPLoaded,
      input logic GameWon, GradeIt,
      input logic [3:0] RoundNumber,
+     input logic [3:0] NumGames,
      output logic [1:0] state,
      output logic RestartGame);
 
@@ -34,7 +35,7 @@ module controlFSM
             end
 
             pre_game: begin
-                if (StartGame && MPLoaded)
+                if (StartGame && MPLoaded && NumGames > 4'b0000)
                     nextState = play;
                 else
                     nextState = pre_game;
@@ -67,7 +68,7 @@ module controlFSM
         RestartGame = 1'b0;
 
         case (currState)
-            first_tick: RestartGame = 1'b1;
+            play: RestartGame = 1'b1;
             default: RestartGame = 1'b0;
         endcase
     end
