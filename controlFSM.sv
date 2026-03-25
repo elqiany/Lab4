@@ -46,7 +46,7 @@ module controlFSM
             end
 
             play: begin
-                if (gameWon)
+                if (GameWon)
                     nextState = first_tick;
                 else if (RoundNumber == 4'd7)
                     nextState = final_guess;
