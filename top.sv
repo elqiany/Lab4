@@ -1,195 +1,126 @@
-`default_nettype none
+//`default_nettype none
 
-module top(
-    input logic CLOCK_100,
-    input logic reset,
-    input logic [1:0] coinValue,
-    input logic coinInserted,
-
-    input logic [1:0] ShapeLocation,
-    input logic LoadShapeNow,
+//entire top module, has all the top level components
+//ties everything together with control and datapath
+module top
+  (input logic CLOCK_100, reset, coinInserted,
+    input logic LoadShapeNow, GradeIt, StartGame,
+    input logic [1:0] coinValue, ShapeLocation,
     input logic [2:0] LoadShape,
-
     input logic [11:0] Guess,
-    input logic GradeIt,
-    input logic StartGame,
-
-    output logic [3:0] NumGames,
-    output logic [3:0] RoundNumber,
-    output logic [3:0] Znarly,
-    output logic [3:0] Zood,
+    output logic [3:0] NumGames, RoundNumber, Znarly, Zood,
     output logic GameWon);
 
-    logic [1:0] coinValue_sync;
-    logic coinInserted_sync;
-    logic startGame_sync;
-    logic [11:0] guess_sync;
-    logic gradeIt_sync;
-    logic [2:0] loadShape_sync;
-    logic [1:0] shapeLocation_sync;
-    logic [1:0] state;
-    logic [1:0] state0;
-    logic [1:0] state2;
-    logic loadShapeNow_sync;
-    logic Restart_Game; //This is new logic because can't have same input and output to FSM
-
-    Synchronizer sync_coin0 (.async(CoinValue[0]), .clock(CLOCK_100), . sync(coinValue_sync[0]);
-    Synchronizer sync_coin1 (.async(CoinValue[1]), .clock(CLOCK_100), . sync(coinValue_sync[1]);
-
-    Synchronizer sync_coinIns (.async(coinInserted), .clock(CLOCK_100), . sync(coinInserted_sync);
-    Synchronizer sync_start (.async(StartGame), .clock(CLOCK_100), . sync(StartGame_sync);
-    Synchronizer sync_grade (.async(GradeIt), .clock(CLOCK_100), . sync(GradeIt_sync);
-    Synchronizer sync_loadNow (.async(LoadShapeNow), .clock(CLOCK_100), . sync(LoadShapeNow_sync);
-
-    //First edge detector for coinInserted button
-    logic coinInserted_out;
-
-    //myAbstractFSM outputs
-    logic [1:0] state;
-    logic [3:0] credit;
-
-    //will declare masterPattern later
+    logic state0, state1, state2, state3;
     logic [11:0] masterPattern;
-
-    //MPMemory outputs
-    logic [11:0] memTot;
-    logic [3:0] FSMTot;
     logic isMPLoaded;
-
-    //Part1 outputs
     logic [3:0] Znarlygreen;
-    logic [2:0] Zoodyellow;
+    logic [2:0] Zoodyellow, ZnarlyTemp;
+    logic shouldIncreaseGames;
+    logic [1:0] coinDropped;
+    logic [1:0] state;
+    logic drop;
+    logic RestartGame;
 
-    //MagComp output
-    logic magComp_out;
+//----------------- Processing the Inputs to be Synchronous  --------------------
+    logic [2:0] LoadShape_sync;
+    logic [1:0] ShapeLocation_sync;
+    logic coinInserted_sync, StartGame_sync, GradeIt_sync;
+    logic LoadShapeNow_sync;
+    logic [11:0] Guess_sync;
 
-    //comparator output
-    logic comp_out;
+  // Put an edge detector on every input with a button, this
+  // also synchronizes the inputs.
+  edgeDetectorFSM edgeCoin (.clock(CLOCK_100),
+        .reset(reset), .btn(coinInserted), .edge_detected(coinInserted_sync));
+  edgeDetectorFSM edgeStartGame (.clock(CLOCK_100),
+        .reset(reset), .btn(StartGame), .edge_detected(StartGame_sync));
+  edgeDetectorFSM edgeGradeIt (.clock(CLOCK_100),
+        .reset(reset), .btn(GradeIt), .edge_detected(GradeIt_sync));
+  edgeDetectorFSM edgeLoadShape (.clock(CLOCK_100),
+        .reset(reset), .btn(LoadShapeNow), .edge_detected(LoadShapeNow_sync));
 
-    //and output
-    logic and_out1;
-
-    //or output
-    logic or_out;
-
-    //edgeDetectorFSM output
-    logic gradeIt_out;
-
-    //output from comparator to see if there are 4 znarly's
-    logic znarlyComp_out;
-
-    logic [1:0] coin_to_fsm;
-
-    //missing the box before the Abstract not sure how or what it means
-
-    edgeDetectorFSM edgeCoin (
-        .CLOCK_100(CLOCK_100),
-        .reset(reset),
-        .btn(coinInserted),
-        .grade_it(coinInserted_out));
-
-    //mux2to1 based on if coinInserted on edge is equal to 0 or 1
-    Mux2to1  #(.WIDTH(2)) coinMux (
-        .I0(2'b00),
-        .I1(coinValue_sync),
-        .S(coinInserted_out),
-        .Y(coin_to_fsm));
-
-    myAbstractFSM coinFSM  (
-        .clock(CLOCK_100),
-        .reset(reset),
-        .coin(coin_to_fsm),
-        .credit(credit),
-        .drop(drop));
-
+  // Put a synchronizer on every input with a button
+    Synchronizer sync_shapeloc1 (.async(ShapeLocation[0]), .clock(CLOCK_100), . sync(ShapeLocation_sync[0]));
+    Synchronizer sync_shapeloc2 (.async(ShapeLocation[1]), .clock(CLOCK_100), . sync(ShapeLocation_sync[1]));
+    Synchronizer sync_LoadShape1 (.async(LoadShape[0]), .clock(CLOCK_100), . sync(LoadShape_sync[0]));
+    Synchronizer sync_LoadShape2 (.async(LoadShape[1]), .clock(CLOCK_100), . sync(LoadShape_sync[1]));
+    Synchronizer sync_LoadShape3 (.async(LoadShape[2]), .clock(CLOCK_100), . sync(LoadShape_sync[2]));
+    Synchronizer sync_guess0 (.async(Guess[0]), .clock(CLOCK_100), . sync(Guess_sync[0]));
+    Synchronizer sync_guess1 (.async(Guess[1]), .clock(CLOCK_100), . sync(Guess_sync[1]));
+    Synchronizer sync_guess2 (.async(Guess[2]), .clock(CLOCK_100), . sync(Guess_sync[2]));
+    Synchronizer sync_guess3 (.async(Guess[3]), .clock(CLOCK_100), . sync(Guess_sync[3]));
+    Synchronizer sync_guess4 (.async(Guess[4]), .clock(CLOCK_100), . sync(Guess_sync[4]));
+    Synchronizer sync_guess5 (.async(Guess[5]), .clock(CLOCK_100), . sync(Guess_sync[5]));
+    Synchronizer sync_guess6 (.async(Guess[6]), .clock(CLOCK_100), . sync(Guess_sync[6]));
+    Synchronizer sync_guess7 (.async(Guess[7]), .clock(CLOCK_100), . sync(Guess_sync[7]));
+    Synchronizer sync_guess8 (.async(Guess[8]), .clock(CLOCK_100), . sync(Guess_sync[8]));
+    Synchronizer sync_guess9 (.async(Guess[9]), .clock(CLOCK_100), . sync(Guess_sync[9]));
+    Synchronizer sync_guess10 (.async(Guess[10]), .clock(CLOCK_100), . sync(Guess_sync[10]));
+    Synchronizer sync_guess11 (.async(Guess[11]), .clock(CLOCK_100), . sync(Guess_sync[11]));
+//----------------------------------------------------------------------------------
     MPMemory mem (
-        .clock(CLOCK_100),
-        .shapeLocation(shapeLocation),
-        .loadShapeNow(.loadShapeNow),
-        .loadShape(loadShape),
-        .memTot(memTot),
-        .FSMTot(FSMTot),
-        .isMPLoaded(isMPLoaded));
+        .loadShapeNow(LoadShapeNow),
+        .clock(CLOCK_100), .state0(state0),
+        .shapeLocation(ShapeLocation),
+        .loadShape(LoadShape),
+        .memTot(masterPattern),
+        .FFSTot(), .isMPLoaded(isMPLoaded));
 
+//-----------------ZNARLY, ZNOOD, GAME WON LOGIC --------------
     Part1 grader (
-        .Guess(Guess),
+        .Guess(Guess_sync),
         .masterPattern(masterPattern),
         .GradeIt(GradeIt),
         .yellows(Zoodyellow),
         .greens(Znarlygreen));
+    assign Zood = {1'b0, Zoodyellow};
+    FourInputAdder fia3 (.A(Znarlygreen[0]), .B(Znarlygreen[1]), .C(Znarlygreen[2]), .D(Znarlygreen[3]), .sum(ZnarlyTemp));
+    assign Znarly = {1'b0, ZnarlyTemp};
+    Comparator #(.WIDTH(3)) comp13 (.A(ZnarlyTemp), .B(3'b100), .AeqB(GameWon));
+//---------------------------------------------------------------------------
 
-    controlFSM ctrl (
-        .CLOCK_100(CLOCK_100),
-        .reset(reset),
-        .startGame(startGame_sync),
-        .MPLoaded(isMPLoaded),
-        .GameWon(GameWon),
-        .GradeIt(GradeIt_sync),
-        .roundNumber(RoundNumber),
-        .state(state));
+  //The state signals are created from the main FSM output
+  // and are used by other components.
+  Comparator #(.WIDTH(2)) comp14 (.A(state), .B(2'b00), .AeqB(state0));
+  Comparator #(.WIDTH(2)) comp15 (.A(state), .B(2'b01), .AeqB(state1));
+  Comparator #(.WIDTH(2)) comp16 (.A(state), .B(2'b10), .AeqB(state2));
+  Comparator #(.WIDTH(2)) comp17 (.A(state), .B(2'b11), .AeqB(state3));
 
-    MagComp gameComp (
-        .A(numGames),
-        .B(4'b0110),
-        .AltB(),
-        .AeqB(),
-        .AgtB(comp_out));
+//---------------------------NUM GAMES LOGIC ------------------------
+  MagComp #(.WIDTH(4)) mc2 (.A(NumGames), .B(4'b0111),
+        .AltB(shouldIncreaseGames), .AeqB(), .AgtB());
+  logic s2D, shouldCountUp;
+  and a16 (s2D, shouldIncreaseGames, drop);
+  logic shouldCountGame;
+  or o5 (shouldCountGame, RestartGame, s2D);
+  and o6 (shouldCountUp, ~RestartGame, drop);
+  Counter #(.WIDTH(4)) gameCounter (
+        .en(shouldCountGame), .clear(reset),
+        .load(), .up(shouldCountUp), .D(), .clock(CLOCK_100), .Q(NumGames));
 
-    Comparator state0comp (
-        .A(2'b00),
-        .B(state),
-        .AeqB(state0)); //unsure if this is meant to be output or clear in diagram
+//---------------------------ROUND NUMBER LOGIC ------------------------
+  logic [2:0] roundIntermediary;
+  assign RoundNumber = {1'b0, roundIntermediary};
+  Counter #(.WIDTH(3)) roundCounter (
+        .en(GradeIt_sync & (state2 | state3)), .clear(),
+        .load(state0), .up(1'b1), .D(3'b000), .clock(CLOCK_100), .Q(roundIntermediary));
 
-    Comparator state2comp (
-        .A(2'b10),
-        .B(state),
-        .AeqB(state2));
+//--------------------------------- FSMs ------------------------------
 
-    //calculations before NumGames counter
-    and a1 (magComp_out, drop, and_out1);
-    or o1 (startGame, and_out1, or_out);
+  logic [3:0] credit;
+  Mux2to1 #(.WIDTH(2)) mux2 (.I1(2'b00), .I0(coinValue),
+         .S(coinInserted_sync), .Y(coinDropped));
+  myAbstractFSM coinFSM (
+        .coin(coinDropped), .clock(CLOCK_100), .reset(reset),
+        .credit(credit), .drop(drop));
 
-    Counter #(.WIDTH(4)) gameCounter (
-                    .D(4'b0000),
-                    .en(or_out),
-                    .clear(state0),
-                    .load(comp_out),
-                    .clock(CLOCK_100),
-                    .up(startGame), //im unsure if this is what diagram wants, looks to be a circle (?) before  so idk
-                    .Q(NumGames));
+  controlFSM mainFSM
+    (.clock(CLOCK_100), .reset(reset), .StartGame(StartGame_sync),
+     .MPLoaded(isMPLoaded), .GameWon(GameWon),
+     .GradeIt(GradeIt_sync), .RoundNumber(RoundNumber),
+     .state(state), .RestartGame(RestartGame), .NumGames(NumGames));
 
-
-    //Grade It Button detector
-    edgeDetectorFSM edgeGrade (
-        .CLOCK_100(CLOCK_100),
-        .reset(reset),
-        .btn(GradeIt),
-        .grade_it(gradeIt_out));
-
-    Counter #(.WIDTH(4)) roundCount (
-        .D(4'b0000),
-        .en(gradeIt_out),
-        .clear(state0),
-        .load(state0),
-        .clock(CLOCK_100),
-        .up(1'b1),
-        .Q(RoundNumber));
-
-    //output znarly and zood
-    convertZood czood (
-        .Zood3(Zoodyellow),
-        .Zood4(Zood));
-
-    convertZnarly cznarly (
-        .ZnarlyBit(Znarlygreen),
-        .ZnarlyVal(Znarly));
-
-    //output GameWon
-    Comparator znarlyComp (
-        .A(Znarlygreen),
-        .B(4'b1111),
-        .AeqB(znarlyComp_out));
-
-    and a2 (znarlyComp_out, state2, GameWon);
 
 endmodule : top
+

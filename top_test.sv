@@ -1,5 +1,8 @@
 `default_nettype none
 
+//testbench for top module
+//checks all game logic
+//works!
 module top_test;
 
     logic CLOCK_100;
@@ -12,6 +15,7 @@ module top_test;
     logic [3:0] NumGames, RoundNumber, Znarly, Zood;
     logic GameWon;
 
+    //instantiation of top module
     top dut (
         .CLOCK_100(CLOCK_100),
         .reset(reset),
@@ -37,10 +41,18 @@ module top_test;
     end
 
     initial begin
-        $monitor($time,,
-            "reset = %b, coinInsrt = %b, LoadShapeNow = %b, GradeIt = %b, Start = %b, coinVal = %b, ShapeLo = %b, LoadShape = %b, Guess = %b, NumGames = %b, RoundNum = %b, Znarly = %b, Zood = %b, GameWon = %b",
-            reset, coinInserted,LoadShapeNow,GradeIt,StartGame,coinValue,ShapeLocation,LoadShape,Guess,NumGames,RoundNumber,Znarly,Zood,GameWon);
-
+        $display(" time | reset |  coin | LoadShape |",
+        "GradeIt | Start | Location | Load |  masterPattern  |",
+         "Guess      | NumGames | Round | Znarly | Zood |",
+         "GameWon");
+        $display("------|-------|-------|-----------|---------|-------|----------|--",
+        " ----|-----------------|-----------------|----------|-------|--------|------|---------");
+        $monitor("  %b   |   %b   | %b, %b ", CLOCK_100, reset, dut.coinInserted_sync, coinValue,
+            "|     %b    |    %b    |   %b   |    %b    ", LoadShapeNow, GradeIt, StartGame, ShapeLocation,
+           "| %b ", LoadShape,
+           "| %b_%b_%b_%b ", dut.masterPattern[11:9], dut.masterPattern[8:6], dut.masterPattern[5:3], dut.masterPattern[2:0],
+           "| %b_%b_%b_%b ", Guess[11:9], Guess[8:6], Guess[5:3], Guess[2:0],
+           "|  %b  |  %b |  %b  | %b |   %b  |", NumGames, RoundNumber, Znarly, Zood, GameWon);
 
         // reset
         reset = 1'b1;
@@ -52,13 +64,11 @@ module top_test;
         ShapeLocation = 2'b00;
         LoadShape = 3'b000;
         Guess = 12'b0;
-
-        #20;
+        #10;
         reset = 1'b0;
+        #10;
 
         // wait a little after reset
-        #20;
-
         // Load master pattern one shape at a time
         // Guess = 12'b100_011_010_001
 
@@ -144,7 +154,19 @@ module top_test;
 
         // Guess 2: correct guess
         // should match loaded master pattern exactly
-        Guess = 12'b100_011_010_001;
+        //  Guess = 12'b100_011_010_001;
+        #20;
+        GradeIt = 1'b1;
+        #20;
+        GradeIt = 1'b0;
+        #60;
+
+        #20;
+        GradeIt = 1'b1;
+        #20;
+        GradeIt = 1'b0;
+        #60;
+
         #20;
         GradeIt = 1'b1;
         #20;
@@ -155,3 +177,4 @@ module top_test;
     end
 
 endmodule : top_test
+

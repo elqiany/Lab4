@@ -1,18 +1,17 @@
 `default_nettype none
 
+
+//FSM that controls everything
 module controlFSM
-    (input logic CLOCK_100,
-     input logic reset,
-
-     input logic StartGame,
-     input logic MPLoaded,
-     input logic GameWon,
-     input logic GradeIt,
+    (input logic clock,
+     input logic reset, StartGame, MPLoaded,
+     input logic GameWon, GradeIt,
      input logic [3:0] RoundNumber,
-
+     input logic [3:0] NumGames,
      output logic [1:0] state,
      output logic RestartGame);
 
+    //states
      typedef enum logic [1:0] {
          first_tick = 2'b00,
          pre_game = 2'b01,
@@ -23,7 +22,7 @@ module controlFSM
      state_t currState, nextState;
 
 
-     always_ff @(posedge CLOCK_100 or posedge reset) begin
+     always_ff @(posedge clock or posedge reset) begin
          if (reset)
              currState <= first_tick;
          else
@@ -39,7 +38,7 @@ module controlFSM
             end
 
             pre_game: begin
-                if (StartGame && MPLoaded)
+                if (StartGame && MPLoaded && NumGames > 4'b0000)
                     nextState = play;
                 else
                     nextState = pre_game;
@@ -48,7 +47,7 @@ module controlFSM
             play: begin
                 if (GameWon)
                     nextState = first_tick;
-                else if (RoundNumber == 4'd7)
+                else if (RoundNumber == 4'b0110)
                     nextState = final_guess;
                 else
                     nextState = play;
@@ -67,17 +66,20 @@ module controlFSM
         endcase
     end
 
+    //sets outputs
     always_comb begin
         state = currState;
         RestartGame = 1'b0;
 
         case (currState)
-            first_tick: RestartGame = 1'b1;
+            play: RestartGame = 1'b1;
             default: RestartGame = 1'b0;
         endcase
     end
 
 endmodule : controlFSM
+
+
 
 
 

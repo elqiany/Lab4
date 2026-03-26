@@ -1,12 +1,16 @@
-`default_nettype none
+//`default_nettype none
 
-
+//FSM to detect edge
+//so if a button is held down,
+//it doesn't count as multiple button
+//presses
 module edgeDetectorFSM
-    (input logic CLOCK_100,
+    (input logic clock,
      input logic reset,
      input logic btn,
-     output logic grade_it);
+     output logic edge_detected);
 
+    //state
     typedef enum logic {
         wait_press,
         held
@@ -14,7 +18,7 @@ module edgeDetectorFSM
 
     state_t currState, nextState;
 
-    always_ff @(posedge CLOCK_100 or posedge reset) begin
+    always_ff @(posedge clock or posedge reset) begin
         if (reset)
             currState <= wait_press;
         else
@@ -23,16 +27,18 @@ module edgeDetectorFSM
 
     always_comb begin
         nextState = currState;
-        grade_it = 1'b0;
+        edge_detected = 1'b0;
 
+        //not pressed
         case (currState)
             wait_press: begin
                 if (btn) begin
-                    grade_it = 1'b1;
+                    edge_detected = 1'b1;
                     nextState = held;
                 end
             end
 
+            //button is being held
             held: begin
                 if (!btn)
                     nextState = wait_press;
@@ -40,7 +46,7 @@ module edgeDetectorFSM
 
             default: begin
                 nextState = wait_press;
-                grade_it = 1'b0;
+                edge_detected = 1'b0;
             end
         endcase
     end

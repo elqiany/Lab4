@@ -1,4 +1,4 @@
-`default_nettype none
+//`default_nettype none
 
 //SaveShape stores a shape value and a bit to check that it has been stored.
 module SaveShape
