@@ -1,5 +1,6 @@
 `default_nettype none
 
+//testbench for control FSM
 module controlFSM_test;
 
     logic clock;
@@ -13,6 +14,7 @@ module controlFSM_test;
 
     logic [1:0] state;
     logic RestartGame;
+    logic [3:0] NumGames;
 
     controlFSM dut (
         .clock(clock),
@@ -22,6 +24,7 @@ module controlFSM_test;
         .GameWon(GameWon),
         .GradeIt(GradeIt),
         .RoundNumber(RoundNumber),
+        .NumGames(NumGames),
         .state(state),
         .RestartGame(RestartGame)
     );
@@ -33,8 +36,9 @@ module controlFSM_test;
 
     initial begin
         $monitor($time,,
-            "currState = %b, nextState = %b, StartGame = %b, MPLoaded = %b, GameWon = %b, GradeIt = %b, RoundNumber = %d, state = %b, RestartGame = %b",
-            dut.currState, dut.nextState, StartGame, MPLoaded, GameWon, GradeIt, RoundNumber, state, RestartGame);
+            "currState = %b, nextState = %b, StartGame = %b,"dut.currState, dut.nextState, StartGame,
+            "MPLoaded = %b, GameWon = %b, GradeIt = %b, RoundNumber = %d,",MPLoaded, GameWon, GradeIt, RoundNumber,
+            "state = %b, RestartGame = %b", state, RestartGame);
 
         // initial values
         reset = 1'b1;
@@ -43,6 +47,7 @@ module controlFSM_test;
         GameWon = 1'b0;
         GradeIt = 1'b0;
         RoundNumber = 4'd0;
+        NumGames = 4'b0000;
 
         @(posedge clock);
         #1;
@@ -67,6 +72,7 @@ module controlFSM_test;
         // go to play
         StartGame = 1'b1;
         MPLoaded = 1'b1;
+        NumGames = 4'b0001;
         @(posedge clock);
         #1;
 
