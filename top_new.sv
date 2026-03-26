@@ -1,4 +1,4 @@
-`default_nettype none
+//`default_nettype none
 
 module top
   (input logic CLOCK_100, reset, coinInserted,
@@ -22,7 +22,7 @@ module top
 
 //----------------- Processing the Inputs to be Synchronous  --------------------
     logic [2:0] LoadShape_sync;
-    logic [1:0] coinValue_sync, ShapeLocation_sync;
+    logic [1:0] ShapeLocation_sync;
     logic coinInserted_sync, StartGame_sync, GradeIt_sync;
     logic LoadShapeNow_sync;
     logic [11:0] Guess_sync;
@@ -39,8 +39,6 @@ module top
         .reset(reset), .btn(LoadShapeNow), .edge_detected(LoadShapeNow_sync));
 
   // Put a synchronizer on every input with a button
-    Synchronizer sync_coin0 (.async(coinValue[0]), .clock(CLOCK_100), .sync(coinValue_sync[0]));
-    Synchronizer sync_coin1 (.async(coinValue[1]), .clock(CLOCK_100), . sync(coinValue_sync[1]));
     Synchronizer sync_shapeloc1 (.async(ShapeLocation[0]), .clock(CLOCK_100), . sync(ShapeLocation_sync[0]));
     Synchronizer sync_shapeloc2 (.async(ShapeLocation[1]), .clock(CLOCK_100), . sync(ShapeLocation_sync[1]));
     Synchronizer sync_LoadShape1 (.async(LoadShape[0]), .clock(CLOCK_100), . sync(LoadShape_sync[0]));
@@ -77,9 +75,7 @@ module top
     assign Zood = {1'b0, Zoodyellow};
     FourInputAdder fia3 (.A(Znarlygreen[0]), .B(Znarlygreen[1]), .C(Znarlygreen[2]), .D(Znarlygreen[3]), .sum(ZnarlyTemp));
     assign Znarly = {1'b0, ZnarlyTemp};
-    logic allGreen;
-    Comparator #(.WIDTH(3)) comp13 (.A(ZnarlyTemp), .B(3'b100), .AeqB(allGreen));
-    and a15 (GameWon, state2, allGreen);
+    Comparator #(.WIDTH(3)) comp13 (.A(ZnarlyTemp), .B(3'b100), .AeqB(GameWon));
 //---------------------------------------------------------------------------
 
   //The state signals are created from the main FSM output
@@ -92,13 +88,14 @@ module top
 //---------------------------NUM GAMES LOGIC ------------------------
   MagComp #(.WIDTH(4)) mc2 (.A(NumGames), .B(4'b0111),
         .AltB(shouldIncreaseGames), .AeqB(), .AgtB());
-  logic s2D;
+  logic s2D, shouldCountUp;
   and a16 (s2D, shouldIncreaseGames, drop);
   logic shouldCountGame;
   or o5 (shouldCountGame, RestartGame, s2D);
+  or o6 (shouldCountUp, RestartGame, drop);
   Counter #(.WIDTH(4)) gameCounter (
         .en(shouldCountGame), .clear(reset),
-        .load(), .up(StartGame_sync), .D(), .clock(CLOCK_100), .Q(NumGames));
+        .load(), .up(shouldCountUp), .D(), .clock(CLOCK_100), .Q(NumGames));
 
 //---------------------------ROUND NUMBER LOGIC ------------------------
   Counter #(.WIDTH(4)) roundCounter (
@@ -107,17 +104,19 @@ module top
 
 //--------------------------------- FSMs ------------------------------
 
-  Mux2to1 #(.WIDTH(2)) mux2 (.I0(2'b00), .I1(coinValue_sync),
+  logic [3:0] credit;
+  Mux2to1 #(.WIDTH(2)) mux2 (.I1(2'b00), .I0(coinValue),
          .S(coinInserted_sync), .Y(coinDropped));
   myAbstractFSM coinFSM (
         .coin(coinDropped), .clock(CLOCK_100), .reset(reset),
-        .credit(), .drop(drop));
+        .credit(credit), .drop(drop));
 
   controlFSM mainFSM
     (.clock(CLOCK_100), .reset(reset), .StartGame(StartGame_sync),
      .MPLoaded(isMPLoaded), .GameWon(GameWon),
      .GradeIt(GradeIt_sync), .RoundNumber(RoundNumber),
-     .NumGames(NumGames),
-     .state(state), .RestartGame(RestartGame));
+     .state(state), .RestartGame(RestartGame), .NumGames(NumGames));
+   
+
 endmodule : top
 
