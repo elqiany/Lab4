@@ -1,5 +1,6 @@
 `default_nettype none
 
+//testbench for edge detector FSM
 module edgeDetectorFSM_test;
 
     logic clock, reset, btn;
@@ -32,27 +33,33 @@ module edgeDetectorFSM_test;
 
         @(posedge clock);
         #1;
-        btn = 1;   // first press should pulse grade_it
+        //first press should pulse grade_it
+        btn = 1;
 
         @(posedge clock);
         #1;
-        btn = 0;   // release back to wait_press
+        //release back to wait_press
+        btn = 0;
 
         @(posedge clock);
         #1;
-        btn = 1;   // second press should pulse again
+        //second press should pulse again
+        btn = 1;
 
         @(posedge clock);
         #1;
-        btn = 1;   // held down should NOT pulse again
+        //held down should NOT pulse again
+        btn = 1;
 
         @(posedge clock);
         #1;
-        btn = 0;   // release
+        //release
+        btn = 0;
 
         @(posedge clock);
         #1;
-        btn = 1;   // press again should pulse again
+        //press again should pulse again
+        btn = 1;
 
         @(posedge clock);
         #1;
